@@ -196,7 +196,6 @@ AS
 BEGIN
     DECLARE @currentDate DATE;
     DECLARE @maxDate DATE;
-
     DECLARE @Leaderboard TABLE (
         MatchDate DATE,
         TeamName NVARCHAR(30),
@@ -208,7 +207,7 @@ BEGIN
     
     SELECT @maxDate = MAX(matchdate) FROM matches;
 
-    SET @currentDate = (SELECT MIN(matchdate) FROM matches);
+    SET @currentDate = SELECT MIN(matchdate) FROM matches;
 
     WHILE @currentDate <= @maxDate
     BEGIN
@@ -241,7 +240,7 @@ BEGIN
 		ORDER BY
 			Points DESC, GoalDifference DESC, OurGoals DESC;
 
-        SET @currentDate = (SELECT MIN(matchdate) FROM matches WHERE matchdate > @currentDate);
+        SET @currentDate = SELECT MIN(matchdate) FROM matches WHERE matchdate > @currentDate;
     END
 
 	SET NOCOUNT ON
@@ -425,9 +424,10 @@ create table teams (
 	ourgoals int,
 	othergoals int,
 	points int,
-	goal_diff AS (ourgoals - othergoals) PERSISTED
+	-- goal_diff AS (ourgoals - othergoals) PERSISTED
 )
 
-CREATE CLUSTERED INDEX idx_teams ON teams(points DESC, goal_diff DESC, ourgoals DESC);
+-- CREATE CLUSTERED INDEX idx_teams ON teams(points DESC, goal_diff DESC, ourgoals DESC);
+CREATE CLUSTERED INDEX idx_teams ON teams(points DESC, ourgoals - othergoals DESC, ourgoals DESC);
 
 select * from teams;
