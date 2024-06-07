@@ -1,0 +1,56 @@
+import java.io.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+
+
+public class dbclassjava {
+
+	/**
+	 * @param args
+	 */
+
+	// Løsning på opgave 10.1.1
+
+	public static void notransactionexample(Connection myConnection) {
+		try {
+			System.out.println("Indtast cpr på en person");
+			BufferedReader inline = new BufferedReader(new InputStreamReader(System.in));
+			String cpr = inline.readLine();
+			String navn = "";
+			String stilling = "";
+			int loen = 0;
+			Statement stmt = myConnection.createStatement();
+			ResultSet res=stmt.executeQuery("select navn,stilling,loen from person where cpr = '" + cpr + "'");
+			if (res.next()) {
+				navn = res.getString(1);
+				stilling = res.getString(2);
+				loen = res.getInt(3);
+				System.out.println(navn + "    " + stilling + "    "+ loen);
+			}
+			else
+				throw new Myexception("Person eksisterer ikke",myConnection);
+			System.out.println("Hvad skal den nye løn være");
+			String nyloen = inline.readLine();
+			String updatesql = "update person set loen = " + nyloen + " where cpr = '" + cpr + "'" ; 
+			stmt.executeUpdate(updatesql);
+			System.out.println("Opdatering fuldført");
+			if (res != null) res.close();
+			if (stmt != null) stmt.close();
+			if (myConnection != null) myConnection.close();
+		}
+		catch (Exception e) {
+			System.out.println("error:  "+e.getMessage());
+		}
+	}
+	
+	
+	
+	
+	
+	

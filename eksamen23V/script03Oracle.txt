@@ -1,0 +1,67 @@
+-- Løsninger fra workshop
+
+-- exercise 4
+-- trigger
+create or replace trigger delaccount 
+after delete on konto
+for each row
+begin
+if (:old.saldo <> 0) then
+  raise_application_error(-20011,'Account could not de deleted');
+  rollback;
+end if;
+end;
+--Test
+delete from konto where kontonr=1001
+--
+
+
+-- Exercise 7
+-- array
+create type gradearraytype as varray(5) of int;  
+
+create table student
+(
+studentno int,
+name varchar(30),
+grades gradearraytype
+);
+insert into student values (1,'clever boy',gradearraytype(11,13,9,10,13));
+insert into student values (2,'fool',gradearraytype(5,3,7,6,6));
+
+create or replace procedure findstud(id int)
+is
+nam student.name%type;
+grad student.grades%type;
+gradesum int;
+i int;
+begin
+select name,grades into nam,grad from student where studentno=id;
+gradesum := 0;
+for i in 1..5 loop
+gradesum := gradesum + grad(i);
+end loop;
+dbms_output.put_line(nam || '   ' || gradesum);
+end;
+
+begin
+findstud(2);
+end;
+
+ 
+-- Exercise 8
+-- cursor
+declare
+summ int;
+cursor mycursor is
+select loen 
+from person;
+begin
+summ := 0;
+for rec in mycursor
+loop
+  summ := summ + rec.loen;
+end loop;
+dbms_output.put_line(summ);
+end;
+--
